@@ -1,0 +1,283 @@
+:root {
+  --bg: #f8f9fa;
+  --surface: #ffffff;
+  --ink: #1f2937;
+  --muted: #6b7280;
+  --line: #e5e7eb;
+  --primary: #0b7285;
+  --primary-soft: #e6fcf5;
+  --danger: #c92a2a;
+  --warning: #e67700;
+  --success: #2b8a3e;
+  --radius: 14px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+}
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+h1 {
+  margin: 0 0 0.75rem;
+  font-size: clamp(1.35rem, 3.5vw, 2rem);
+}
+
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app-shell {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0.5rem 0.9rem 6rem;
+}
+
+.top-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
+}
+
+.brand {
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+
+.desktop-links {
+  display: none;
+  gap: 1rem;
+}
+
+.desktop-links a.active,
+.bottom-nav a.active {
+  font-weight: 700;
+}
+
+.alert-banner {
+  margin: 0.5rem 0 1rem;
+  background: #fff5f5;
+  color: var(--danger);
+  border: 1px solid #ffc9c9;
+  border-radius: var(--radius);
+  padding: 0.7rem 0.85rem;
+  font-size: 0.92rem;
+}
+
+.page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.grid-two {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.row-inline,
+.row-between,
+.row-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.row-between {
+  justify-content: space-between;
+}
+
+.row-actions {
+  justify-content: flex-end;
+}
+
+.btn {
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 0.55rem 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+}
+
+.btn-secondary {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.btn-ghost {
+  border-color: var(--line);
+  background: #fff;
+}
+
+.badge {
+  width: fit-content;
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+  font-size: 0.75rem;
+  border: 1px solid var(--line);
+  color: var(--muted);
+}
+
+.badge-warning {
+  background: #fff4e6;
+  color: var(--warning);
+}
+
+.badge-danger {
+  background: #fff5f5;
+  color: var(--danger);
+}
+
+.badge-success {
+  background: #ebfbee;
+  color: var(--success);
+}
+
+.progress-track {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: #e9ecef;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--primary);
+}
+
+.service-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 0.8rem;
+}
+
+.service-icon.energia {
+  background: #f08c00;
+}
+
+.service-icon.agua {
+  background: #1971c2;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+input,
+textarea,
+select,
+.picker {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.55rem 0.65rem;
+  font: inherit;
+  background: #fff;
+}
+
+.picker.active {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.bottom-nav {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: min(860px, 100%);
+  background: #ffffffef;
+  backdrop-filter: blur(6px);
+  border-top: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding: 0.65rem;
+  text-align: center;
+}
+
+.step-indicator,
+small {
+  color: var(--muted);
+}
+
+.success-msg {
+  color: var(--success);
+}
+
+.error-msg {
+  color: var(--danger);
+}
+
+@media (min-width: 760px) {
+  .app-shell {
+    padding-bottom: 1rem;
+  }
+  .desktop-links {
+    display: flex;
+  }
+  .bottom-nav {
+    display: none;
+  }
+  .grid-two {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
