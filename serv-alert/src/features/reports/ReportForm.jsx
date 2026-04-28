@@ -48,14 +48,14 @@ function ReportForm({ onSubmit, isLoading }) {
               type="button"
               onClick={() => update('service_type', 'energia')}
             >
-              Energia
+              ⚡Electricidad
             </button>
             <button
               className={`picker ${form.service_type === 'agua' ? 'active' : ''}`}
               type="button"
               onClick={() => update('service_type', 'agua')}
             >
-              Agua
+              💧Agua
             </button>
           </div>
         </div>
@@ -90,7 +90,7 @@ function ReportForm({ onSubmit, isLoading }) {
             value={form.description}
             onChange={(e) => update('description', e.target.value)}
             rows={4}
-            placeholder="Describe rapidamente que esta pasando en tu zona."
+            placeholder="Breve descripcion del problema"
           />
         </div>
       )}

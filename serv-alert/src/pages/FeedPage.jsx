@@ -39,15 +39,20 @@ function FeedPage() {
       </div>
       {reportsLoading && <p>Cargando reportes...</p>}
       {reportsError && <p>{reportsError}</p>}
+      {!reportsLoading && !reportsError && filtered.length === 0 && (
+        <p>No hay resultados para los filtros seleccionados.</p>
+      )}
       <div className="stack">
         {filtered.map((report) => (
-          <div key={report.id}>
+          <div key={report.id} className="feed-item">
             <ReportCard
               report={report}
               onConfirm={confirmReport}
               disabledConfirm={hasConfirmed(report.id)}
             />
-            <Link to={`/feed/${report.id}`}>Ver detalle</Link>
+            <Link to={`/feed/${report.id}`} className="link-strong">
+              Ver detalle del reporte
+            </Link>
           </div>
         ))}
       </div>

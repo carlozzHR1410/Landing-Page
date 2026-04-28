@@ -4,7 +4,8 @@ function Navbar() {
   return (
     <header className="top-nav">
       <NavLink to="/" className="brand">
-        Serv-Alert
+        <span className="brand-mark" aria-hidden="true" />
+        <span>SERV-ALERT</span>
       </NavLink>
       <nav className="desktop-links">
         <NavLink to="/map">Mapa</NavLink>
