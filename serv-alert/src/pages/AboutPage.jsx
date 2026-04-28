@@ -1,16 +1,26 @@
+import AuthCard from '../components/AuthCard'
+
 function AboutPage() {
   return (
     <section className="page">
-      <h1>Acerca de Serv-Alert</h1>
-      <article className="card">
+      <div className="page-head">
+        <h1>Acceso y registro</h1>
         <p>
-          Serv-Alert es una plataforma comunitaria no oficial para centralizar reportes de fallas de
-          energia y agua en la zona oriental de El Salvador.
+          El sistema usa cuentas de cliente y administrador para reservar, consultar y gestionar la
+          agenda.
         </p>
-        <p>
-          No existe afiliacion con ANDA ni AES. El objetivo es mejorar coordinacion vecinal y
-          visibilidad de interrupciones.
-        </p>
+      </div>
+
+      <AuthCard />
+
+      <article className="sheet">
+        <h2>Funciones cubiertas por la plantilla</h2>
+        <div className="feature-list">
+          <p>Registro e inicio de sesion para clientes y administrador.</p>
+          <p>Reserva de citas por fecha, hora y tipo de servicio.</p>
+          <p>Calendario interactivo con espacios ocupados y libres.</p>
+          <p>Panel de gestion para editar, completar o cancelar citas.</p>
+        </div>
       </article>
     </section>
   )
