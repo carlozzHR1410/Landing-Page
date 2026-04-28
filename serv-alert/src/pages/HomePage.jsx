@@ -8,8 +8,6 @@ function createSeedReport(id, service, location, minutesAgo, reportType = 'issue
     service,
     location,
     name: 'Reporte comunitario',
-    email: 'comunidad@serv-alert.com',
-    dui: '00000000-0',
     description: 'Reporte inicial de monitoreo comunitario.',
     reportType,
     createdAt: new Date(Date.now() - minutesAgo * 60 * 1000).toISOString(),
@@ -27,8 +25,6 @@ const blankForm = {
   service: 'Electricidad',
   location: '',
   name: '',
-  email: '',
-  dui: '',
   description: '',
 }
 
@@ -53,8 +49,6 @@ function normalizeReport(report) {
     service: report.service,
     location: report.location,
     name: report.name || report.full_name || 'No disponible',
-    email: report.email || 'No disponible',
-    dui: report.dui || 'No disponible',
     description: report.description || 'Sin descripcion',
     reportType: report.reportType || report.report_type || 'issue',
     createdAt: report.createdAt || report.created_at || new Date().toISOString(),
@@ -180,8 +174,6 @@ function HomePage() {
       service: formData.service,
       location: formData.location.trim(),
       name: formData.name.trim(),
-      email: formData.email.trim(),
-      dui: formData.dui.trim(),
       description: formData.description.trim(),
     }
 
@@ -358,30 +350,6 @@ function HomePage() {
                 </label>
 
                 <label>
-                  <span>Correo</span>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="correo@ejemplo.com"
-                    required
-                  />
-                </label>
-
-                <label>
-                  <span>DUI</span>
-                  <input
-                    type="text"
-                    name="dui"
-                    value={formData.dui}
-                    onChange={handleChange}
-                    placeholder="00000000-0"
-                    required
-                  />
-                </label>
-
-                <label>
                   <span>{content.descriptionLabel}</span>
                   {reportMode === 'restore' ? (
                     <textarea name="description" value={formData.description} rows="5" readOnly />
@@ -423,12 +391,6 @@ function HomePage() {
                 </p>
                 <p>
                   <strong>Nombre:</strong> {selectedReport.name}
-                </p>
-                <p>
-                  <strong>Correo:</strong> {selectedReport.email}
-                </p>
-                <p>
-                  <strong>DUI:</strong> {selectedReport.dui}
                 </p>
                 <p>
                   <strong>Descripcion:</strong> {selectedReport.description}

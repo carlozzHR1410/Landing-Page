@@ -27,8 +27,6 @@ function mapReport(row) {
     service: row.service,
     location: row.location,
     name: row.name,
-    email: row.email,
-    dui: row.dui,
     description: row.description,
     createdAt: row.createdAt,
   }
@@ -53,8 +51,6 @@ app.get('/api/reports', async (_request, response) => {
           service,
           location,
           full_name AS name,
-          email,
-          dui,
           description,
           created_at AS createdAt
         FROM reports
@@ -73,13 +69,13 @@ app.get('/api/reports', async (_request, response) => {
 })
 
 app.post('/api/reports', async (request, response) => {
-  const { reportType, service, location, name, email, dui, description } = request.body || {}
+  const { reportType, service, location, name, description } = request.body || {}
 
   if (!['issue', 'restore'].includes(reportType)) {
     return response.status(400).json({ message: 'Tipo de reporte invalido.' })
   }
 
-  if (![service, location, name, email, dui, description].every((value) => String(value || '').trim())) {
+  if (![service, location, name, description].every((value) => String(value || '').trim())) {
     return response.status(400).json({ message: 'Todos los campos son obligatorios.' })
   }
 
@@ -102,8 +98,8 @@ app.post('/api/reports', async (request, response) => {
         service.trim(),
         location.trim(),
         name.trim(),
-        email.trim(),
-        dui.trim(),
+        '',
+        '',
         description.trim(),
       ],
     )
@@ -116,8 +112,6 @@ app.post('/api/reports', async (request, response) => {
           service,
           location,
           full_name AS name,
-          email,
-          dui,
           description,
           created_at AS createdAt
         FROM reports
