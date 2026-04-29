@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useStore } from '../store/useStore'
 import { getTodayKey } from '../utils/date'
 import Button from './Button'
@@ -27,11 +27,6 @@ function AppointmentForm({
 
   const [form, setForm] = useState(makeInitialState(initialValues))
   const [message, setMessage] = useState('')
-
-  useEffect(() => {
-    setForm(makeInitialState(initialValues))
-    setMessage('')
-  }, [initialValues])
 
   const blockedSlots = appointments
     .filter(
