@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import { ReportsProvider } from '../context/ReportsContext'
+import Footer from './Footer'
 import Navbar from './Navbar'
 
 const THEME_STORAGE_KEY = 'serv-alert-theme'
@@ -41,6 +42,7 @@ function Layout() {
           <main className="page-container">
             <Outlet />
           </main>
+          <Footer />
         </div>
       </div>
     </ReportsProvider>
