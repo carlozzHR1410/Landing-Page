@@ -1,11 +1,13 @@
 import { spawn } from 'node:child_process'
 
-const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm'
-
 function runScript(name) {
-  return spawn(npmCommand, ['run', name], {
+  const command = process.platform === 'win32' ? `npm.cmd run ${name}` : `npm run ${name}`
+
+  return spawn(command, {
+    shell: true,
     stdio: 'inherit',
     env: process.env,
+    cwd: process.cwd(),
   })
 }
 
