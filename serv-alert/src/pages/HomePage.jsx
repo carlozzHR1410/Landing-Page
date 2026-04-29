@@ -1,134 +1,74 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { useReports } from '../context/ReportsContext'
+import { easternDepartments, getDistrictsByDepartment } from '../data/easternLocations'
+import {
+  formatElapsedTime,
+  isActiveIssue,
+  isIssueReport,
+  sortReportsByCreatedDesc,
+  supportedServices,
+} from '../utils/reportUtils'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
-
-function createSeedReport(id, service, location, minutesAgo, reportType = 'issue') {
-  return {
-    id,
-    service,
-    location,
-    name: 'Reporte comunitario',
-    description: 'Reporte inicial de monitoreo comunitario.',
-    reportType,
-    createdAt: new Date(Date.now() - minutesAgo * 60 * 1000).toISOString(),
-  }
-}
-
-const initialReports = [
-  createSeedReport(1, 'Electricidad', 'Colonia Esmeralda, San Miguel', 20),
-  createSeedReport(2, 'Electricidad', 'Colonia Esmeralda, San Miguel', 25),
-  createSeedReport(3, 'Agua', 'Colonia Esmeralda, San Miguel', 10),
-]
-
-const blankForm = {
-  reportId: '',
-  service: 'Electricidad',
-  location: '',
-  name: '',
-  description: '',
-}
+const defaultDepartment = easternDepartments[0]
+const defaultDistrict = getDistrictsByDepartment(defaultDepartment)[0]
 
 const modalCopy = {
   issue: {
-    title: 'Nuevo Reporte de falla',
+    title: 'Nuevo reporte de falla',
     descriptionLabel: 'Descripcion del problema',
-    descriptionPlaceholder: 'Breve descripcion del problema',
-    actionLabel: 'Reportar',
+    descriptionPlaceholder: 'Explica brevemente lo que ocurre en la zona.',
+    actionLabel: 'Registrar falla',
   },
   restore: {
-    title: 'Reporte de reestablecido',
-    descriptionLabel: 'Descripcion de la situacion',
-    descriptionPlaceholder: 'Breve descripcion de la situacion',
-    actionLabel: 'Reportar',
+    title: 'Registrar restablecimiento',
+    descriptionLabel: 'Descripcion del restablecimiento',
+    descriptionPlaceholder: 'Explica como se normalizo el servicio.',
+    actionLabel: 'Registrar restablecimiento',
   },
 }
 
-function normalizeReport(report) {
+function getBlankForm() {
   return {
-    id: report.id,
-    service: report.service,
-    location: report.location,
-    name: report.name || report.full_name || 'No disponible',
-    description: report.description || 'Sin descripcion',
-    reportType: report.reportType || report.report_type || 'issue',
-    createdAt: report.createdAt || report.created_at || new Date().toISOString(),
+    reportId: '',
+    service: supportedServices[0],
+    department: defaultDepartment,
+    district: defaultDistrict,
+    name: '',
+    description: '',
   }
 }
 
-function formatElapsedTime(createdAt) {
-  const timestamp = new Date(createdAt).getTime()
-
-  if (Number.isNaN(timestamp)) {
-    return 'Hace un momento'
+function getRestoreForm(issue) {
+  return {
+    reportId: issue ? String(issue.id) : '',
+    service: issue?.service || supportedServices[0],
+    department: issue?.department || defaultDepartment,
+    district: issue?.district || defaultDistrict,
+    name: '',
+    description: 'Servicio restablecido y funcionando nuevamente.',
   }
-
-  const minutes = Math.max(0, Math.floor((Date.now() - timestamp) / 60000))
-
-  if (minutes < 1) {
-    return 'Hace un momento'
-  }
-
-  if (minutes < 60) {
-    return `${minutes} minuto${minutes === 1 ? '' : 's'}`
-  }
-
-  const hours = Math.floor(minutes / 60)
-
-  if (hours < 24) {
-    return `${hours} hora${hours === 1 ? '' : 's'}`
-  }
-
-  const days = Math.floor(hours / 24)
-  return `${days} dia${days === 1 ? '' : 's'}`
 }
 
 function HomePage() {
+  const { reports, notice, setNotice, createIssueReport, createRestoreReport } = useReports()
   const [activeModal, setActiveModal] = useState(null)
   const [reportMode, setReportMode] = useState('issue')
-  const [reports, setReports] = useState(initialReports)
-  const [formData, setFormData] = useState(blankForm)
-  const [notice, setNotice] = useState('')
+  const [formData, setFormData] = useState(getBlankForm)
   const [selectedReport, setSelectedReport] = useState(null)
-  const issueReports = reports.filter((report) => report.reportType !== 'restore')
 
-  useEffect(() => {
-    const loadReports = async () => {
-      try {
-        const response = await fetch(`${API_URL}/reports`)
-
-        if (!response.ok) {
-          throw new Error('No se pudieron cargar los reportes')
-        }
-
-        const data = await response.json()
-
-        if (Array.isArray(data.reports) && data.reports.length > 0) {
-          setReports(data.reports.map(normalizeReport))
-        }
-      } catch (error) {
-        setNotice('Mostrando reportes locales mientras conectas MySQL.')
-      }
-    }
-
-    loadReports()
-  }, [])
+  const activeIssues = sortReportsByCreatedDesc(reports.filter(isActiveIssue))
+  const latestIssues = sortReportsByCreatedDesc(reports.filter(isIssueReport)).slice(0, 3)
 
   const openModal = (mode) => {
-    if (mode === 'restore' && issueReports.length === 0) {
-      setNotice('Primero debe existir al menos un reporte activo para poder reestablecerlo.')
+    if (mode === 'restore' && activeIssues.length === 0) {
+      setNotice('Primero debe existir al menos un reporte pendiente para marcarlo como restablecido.')
       return
     }
 
-    const selectedIssue = mode === 'restore' ? issueReports[0] : null
-
+    const selectedIssue = mode === 'restore' ? activeIssues[0] : null
     setReportMode(mode)
-    setFormData({
-      ...blankForm,
-      reportId: selectedIssue ? String(selectedIssue.id) : '',
-      service: selectedIssue?.service || 'Electricidad',
-      location: selectedIssue?.location || '',
-      description: mode === 'restore' ? 'Ya esta solucionado.' : '',
-    })
+    setFormData(mode === 'restore' ? getRestoreForm(selectedIssue) : getBlankForm())
     setActiveModal('form')
   }
 
@@ -145,20 +85,26 @@ function HomePage() {
   const handleChange = (event) => {
     const { name, value } = event.target
 
+    if (name === 'department') {
+      const nextDistrict = getDistrictsByDepartment(value)[0] || ''
+      setFormData((current) => ({
+        ...current,
+        department: value,
+        district: nextDistrict,
+      }))
+      return
+    }
+
     if (name === 'reportId') {
-      const selectedIssue = issueReports.find((report) => String(report.id) === value)
+      const selectedIssue = activeIssues.find((report) => String(report.id) === value)
 
       setFormData((current) => ({
         ...current,
         reportId: value,
         service: selectedIssue?.service || current.service,
-        location: selectedIssue?.location || current.location,
-        description: 'Ya esta solucionado.',
+        department: selectedIssue?.department || current.department,
+        district: selectedIssue?.district || current.district,
       }))
-      return
-    }
-
-    if (reportMode === 'restore' && ['service', 'location', 'description'].includes(name)) {
       return
     }
 
@@ -169,63 +115,36 @@ function HomePage() {
     event.preventDefault()
     setNotice('')
 
-    const payload = {
-      reportId: formData.reportId || null,
-      reportType: reportMode,
-      service: formData.service,
-      location: formData.location.trim(),
-      name: formData.name.trim(),
-      description: formData.description.trim(),
+    const payload =
+      reportMode === 'issue'
+        ? {
+            service: formData.service,
+            department: formData.department,
+            district: formData.district,
+            name: formData.name.trim(),
+            description: formData.description.trim(),
+          }
+        : {
+            reportId: Number(formData.reportId),
+            name: formData.name.trim(),
+            description: formData.description.trim(),
+          }
+
+    const result =
+      reportMode === 'issue'
+        ? await createIssueReport(payload)
+        : await createRestoreReport(payload)
+
+    if (!result.ok) {
+      setNotice(result.message || 'No se pudo completar la operacion.')
+      return
     }
 
-    try {
-      const response = await fetch(`${API_URL}/reports`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      })
-
-      if (!response.ok) {
-        const data = await response.json().catch(() => ({}))
-        throw new Error(data.message || 'No se pudo guardar el reporte')
-      }
-
-      const responseData = await response.json()
-
-      setReports((current) => {
-        if (reportMode === 'restore') {
-          return current.filter((report) => String(report.id) !== formData.reportId)
-        }
-
-        const savedReport = normalizeReport(responseData.report)
-        return [savedReport, ...current].slice(0, 8)
-      })
-      setActiveModal('success')
-    } catch (error) {
-      if (reportMode === 'restore') {
-        setNotice('No se pudo borrar el reporte en MySQL. Intenta otra vez.')
-        return
-      }
-
-      setReports((current) => {
-        const localReport = normalizeReport({
-          id: Date.now(),
-          service: payload.service,
-          location: payload.location,
-          reportType: payload.reportType,
-          createdAt: new Date().toISOString(),
-        })
-
-        return [localReport, ...current].slice(0, 8)
-      })
-      setNotice('No se guardo en MySQL. Revisa la conexion del backend y la clave de la base.')
-      setActiveModal('success')
-    }
+    setActiveModal('success')
   }
 
   const content = modalCopy[reportMode]
+  const districtOptions = getDistrictsByDepartment(formData.department)
 
   return (
     <section className="page home-page">
@@ -234,22 +153,44 @@ function HomePage() {
 
         <div className="serv-alert-hero">
           <h1>
-            Monitoreo Comunitario de
+            Monitoreo comunitario de
             <br />
-            Servicios Basicos en Oriente
+            servicios basicos en Oriente
           </h1>
+          <p className="serv-alert-hero-copy">
+            Registra fallas por departamento y distrito, consulta el historial completo y sigue los
+            restablecimientos desde un mismo panel.
+          </p>
 
-          <button
-            type="button"
-            className="btn btn-soft serv-alert-action"
-            onClick={() => openModal('issue')}
-          >
-            + Reportar una falla
-          </button>
+          <div className="serv-alert-hero-actions">
+            <button
+              type="button"
+              className="btn btn-soft serv-alert-action"
+              onClick={() => openModal('issue')}
+            >
+              + Reportar una falla
+            </button>
+
+            <button
+              type="button"
+              className="btn btn-secondary serv-alert-action"
+              onClick={() => openModal('restore')}
+            >
+              + Reportar restablecimiento
+            </button>
+          </div>
         </div>
 
         <section className="serv-alert-section">
-          <h2>Reportes Recientes</h2>
+          <div className="serv-alert-section-head">
+            <div>
+              <h2>Reportes recientes</h2>
+              <p>En la portada se muestran solo los tres mas recientes.</p>
+            </div>
+            <Link className="btn btn-soft serv-alert-link-btn" to="/reportes">
+              Ver mas
+            </Link>
+          </div>
 
           <div className="serv-alert-table">
             <div className="serv-alert-row serv-alert-row-header">
@@ -258,36 +199,32 @@ function HomePage() {
               <span>Tiempo de falla</span>
             </div>
 
-            {issueReports.map((report) => (
-              <button
-                type="button"
-                className="serv-alert-row serv-alert-row-button"
-                key={report.id}
-                onClick={() => openDetails(report)}
-              >
-                <span data-label="Servicio">{report.service}</span>
-                <span data-label="Ubicacion">{report.location}</span>
-                <span data-label="Tiempo de falla">{formatElapsedTime(report.createdAt)}</span>
-              </button>
-            ))}
+            {latestIssues.length === 0 ? (
+              <div className="serv-alert-empty">
+                <p>No hay reportes disponibles por ahora.</p>
+              </div>
+            ) : (
+              latestIssues.map((report) => (
+                <button
+                  type="button"
+                  className="serv-alert-row serv-alert-row-button"
+                  key={report.id}
+                  onClick={() => openDetails(report)}
+                >
+                  <span data-label="Servicio">{report.service}</span>
+                  <span data-label="Ubicacion">{report.location}</span>
+                  <span data-label="Tiempo de falla">{formatElapsedTime(report.createdAt)}</span>
+                </button>
+              ))
+            )}
           </div>
         </section>
-
-        <div className="serv-alert-footer-action">
-          <button
-            type="button"
-            className="btn btn-soft serv-alert-action"
-            onClick={() => openModal('restore')}
-          >
-            + Reportar servicio reestablecido
-          </button>
-        </div>
       </div>
 
       {activeModal && (
         <div className="serv-alert-overlay" role="presentation">
           {activeModal === 'form' ? (
-            <div className="serv-alert-modal">
+            <div className={`serv-alert-modal ${reportMode === 'restore' ? 'serv-alert-modal-compact' : ''}`}>
               <h3>{content.title}</h3>
 
               <form className="serv-alert-form" onSubmit={handleSubmit}>
@@ -296,7 +233,7 @@ function HomePage() {
                     <label>
                       <span>Reporte registrado</span>
                       <select name="reportId" value={formData.reportId} onChange={handleChange}>
-                        {issueReports.map((report) => (
+                        {activeIssues.map((report) => (
                           <option key={report.id} value={report.id}>
                             {report.service} - {report.location}
                           </option>
@@ -304,36 +241,43 @@ function HomePage() {
                       </select>
                     </label>
 
-                    <label>
-                      <span>Tipo de servicio</span>
-                      <input type="text" name="service" value={formData.service} readOnly />
-                    </label>
-
-                    <label>
-                      <span>Ubicacion</span>
-                      <input type="text" name="location" value={formData.location} readOnly />
-                    </label>
+                    <p className="serv-alert-selected-report">
+                      {formData.service} - {formData.district}, {formData.department}
+                    </p>
                   </>
                 ) : (
                   <>
                     <label>
                       <span>Tipo de servicio</span>
                       <select name="service" value={formData.service} onChange={handleChange}>
-                        <option>Electricidad</option>
-                        <option>Agua</option>
+                        {supportedServices.map((service) => (
+                          <option key={service} value={service}>
+                            {service}
+                          </option>
+                        ))}
                       </select>
                     </label>
 
                     <label>
-                      <span>Ubicacion</span>
-                      <input
-                        type="text"
-                        name="location"
-                        value={formData.location}
-                        onChange={handleChange}
-                        placeholder="Escribe la ubicacion exacta"
-                        required
-                      />
+                      <span>Departamento</span>
+                      <select name="department" value={formData.department} onChange={handleChange}>
+                        {easternDepartments.map((department) => (
+                          <option key={department} value={department}>
+                            {department}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+
+                    <label>
+                      <span>Distrito</span>
+                      <select name="district" value={formData.district} onChange={handleChange}>
+                        {districtOptions.map((district) => (
+                          <option key={district} value={district}>
+                            {district}
+                          </option>
+                        ))}
+                      </select>
                     </label>
                   </>
                 )}
@@ -352,18 +296,14 @@ function HomePage() {
 
                 <label>
                   <span>{content.descriptionLabel}</span>
-                  {reportMode === 'restore' ? (
-                    <textarea name="description" value={formData.description} rows="5" readOnly />
-                  ) : (
-                    <textarea
-                      name="description"
-                      value={formData.description}
-                      onChange={handleChange}
-                      placeholder={content.descriptionPlaceholder}
-                      rows="5"
-                      required
-                    />
-                  )}
+                  <textarea
+                    name="description"
+                    value={formData.description}
+                    onChange={handleChange}
+                    placeholder={content.descriptionPlaceholder}
+                    rows={reportMode === 'restore' ? 4 : 5}
+                    required
+                  />
                 </label>
 
                 <div className="serv-alert-form-actions">
@@ -385,10 +325,16 @@ function HomePage() {
                   <strong>Servicio:</strong> {selectedReport.service}
                 </p>
                 <p>
+                  <strong>Departamento:</strong> {selectedReport.department}
+                </p>
+                <p>
+                  <strong>Distrito:</strong> {selectedReport.district}
+                </p>
+                <p>
                   <strong>Ubicacion:</strong> {selectedReport.location}
                 </p>
                 <p>
-                  <strong>Tiempo de falla:</strong> {formatElapsedTime(selectedReport.createdAt)}
+                  <strong>Tiempo transcurrido:</strong> {formatElapsedTime(selectedReport.createdAt)}
                 </p>
                 <p>
                   <strong>Nombre:</strong> {selectedReport.name}
@@ -404,11 +350,11 @@ function HomePage() {
             </div>
           ) : (
             <div className="serv-alert-modal serv-alert-modal-success">
-              <h3>Reporte realizado</h3>
+              <h3>Reporte registrado</h3>
               <div className="serv-alert-check" aria-hidden="true">
                 &#10003;
               </div>
-              <p>Su reporte ha sido realizado exitosamente.</p>
+              <p>La informacion quedo actualizada correctamente.</p>
               <button type="button" className="btn btn-danger serv-alert-close" onClick={closeModal}>
                 Cerrar
               </button>

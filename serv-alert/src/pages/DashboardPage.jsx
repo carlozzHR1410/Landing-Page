@@ -85,6 +85,7 @@ function DashboardPage() {
 
       {editingAppointment && (
         <AppointmentForm
+          key={editingAppointment.id}
           initialValues={editingAppointment}
           editingId={editingAppointment.id}
           onSubmit={handleUpdate}

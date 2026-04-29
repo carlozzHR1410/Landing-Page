@@ -16,7 +16,8 @@ function CalendarGrid({ monthKey, selectedDate, countsByDate, onSelectDate }) {
       <div className="calendar-grid">
         {days.map((dateKey) => {
           const isSelected = dateKey === selectedDate
-          const count = countsByDate[dateKey] || 0
+          const counts = countsByDate[dateKey] || { issue: 0, restore: 0 }
+          const totalCount = counts.issue + counts.restore
 
           return (
             <button
@@ -28,7 +29,12 @@ function CalendarGrid({ monthKey, selectedDate, countsByDate, onSelectDate }) {
               onClick={() => onSelectDate(dateKey)}
             >
               <span>{dateKey.slice(-2)}</span>
-              {count > 0 && <small>{count}</small>}
+              {totalCount > 0 && (
+                <div className="calendar-day-counts">
+                  {counts.issue > 0 && <small>F {counts.issue}</small>}
+                  {counts.restore > 0 && <small>R {counts.restore}</small>}
+                </div>
+              )}
             </button>
           )
         })}
