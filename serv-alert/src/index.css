@@ -84,6 +84,13 @@
   --toggle-moon: #35577c;
   --danger: #b5434a;
   --success: #1c7f59;
+  --report-issue-badge-bg: rgba(214, 96, 104, 0.18);
+  --report-issue-badge-text: #9f2730;
+  --report-issue-badge-border: rgba(181, 67, 74, 0.28);
+  --report-restore-badge-bg: rgba(28, 127, 89, 0.16);
+  --report-restore-badge-text: #0f5136;
+  --calendar-issue-card-bg: rgba(231, 238, 246, 0.92);
+  --calendar-restore-card-bg: rgba(224, 239, 234, 0.92);
 }
 
 * {
@@ -982,12 +989,39 @@ textarea {
 
 .serv-alert-row {
   display: grid;
-  grid-template-columns: 1.1fr 2fr 1.2fr;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.6fr) minmax(150px, 0.9fr);
   gap: 1rem;
   align-items: center;
   padding: 0.95rem 1.5rem;
   color: var(--panel-text);
   font-size: clamp(1rem, 2vw, 1.15rem);
+}
+
+.serv-alert-row > span:last-child {
+  justify-self: center;
+  text-align: center;
+}
+
+.serv-alert-row > span:nth-child(2) {
+  justify-self: center;
+  text-align: center;
+}
+
+.serv-alert-row > span:first-child {
+  justify-self: center;
+  text-align: center;
+}
+
+.serv-alert-row-header > span:last-child {
+  width: 100%;
+}
+
+.serv-alert-row-header > span:nth-child(2) {
+  width: 100%;
+}
+
+.serv-alert-row-header > span:first-child {
+  width: 100%;
 }
 
 .serv-alert-row-button {
@@ -1314,12 +1348,15 @@ textarea {
 }
 
 .report-kind-issue {
-  background: rgba(59, 130, 246, 0.18);
+  background: var(--report-issue-badge-bg, rgba(175, 58, 63, 0.24));
+  color: var(--report-issue-badge-text, #ffd9dc);
+  border: 1px solid var(--report-issue-badge-border, rgba(228, 112, 117, 0.28));
 }
 
 .report-kind-restore,
 .status-restored {
-  background: rgba(29, 127, 89, 0.18);
+  background: var(--report-restore-badge-bg, rgba(29, 127, 89, 0.18));
+  color: var(--report-restore-badge-text, inherit);
 }
 
 .calendar-legend {
@@ -1364,11 +1401,13 @@ textarea {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1rem;
+  align-items: start;
 }
 
 .calendar-day-panel {
   display: grid;
   gap: 0.9rem;
+  align-content: start;
 }
 
 .calendar-day-panel-head {
@@ -1390,6 +1429,14 @@ textarea {
 
 .report-day-card {
   color: var(--page-text);
+}
+
+.calendar-day-panel:first-child .report-day-card {
+  background: var(--calendar-issue-card-bg, rgba(24, 37, 60, 0.96));
+}
+
+.calendar-day-panel:last-child .report-day-card {
+  background: var(--calendar-restore-card-bg, rgba(22, 48, 52, 0.96));
 }
 
 .site-footer {
