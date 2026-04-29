@@ -170,6 +170,7 @@ function HomePage() {
     setNotice('')
 
     const payload = {
+      reportId: formData.reportId || null,
       reportType: reportMode,
       service: formData.service,
       location: formData.location.trim(),
@@ -191,23 +192,24 @@ function HomePage() {
         throw new Error(data.message || 'No se pudo guardar el reporte')
       }
 
-      const data = await response.json()
-      const savedReport = normalizeReport(data.report)
+      const responseData = await response.json()
 
       setReports((current) => {
         if (reportMode === 'restore') {
           return current.filter((report) => String(report.id) !== formData.reportId)
         }
 
+        const savedReport = normalizeReport(responseData.report)
         return [savedReport, ...current].slice(0, 8)
       })
       setActiveModal('success')
     } catch (error) {
-      setReports((current) => {
-        if (reportMode === 'restore') {
-          return current.filter((report) => String(report.id) !== formData.reportId)
-        }
+      if (reportMode === 'restore') {
+        setNotice('No se pudo borrar el reporte en MySQL. Intenta otra vez.')
+        return
+      }
 
+      setReports((current) => {
         const localReport = normalizeReport({
           id: Date.now(),
           service: payload.service,
@@ -319,7 +321,6 @@ function HomePage() {
                       <select name="service" value={formData.service} onChange={handleChange}>
                         <option>Electricidad</option>
                         <option>Agua</option>
-                        <option>Internet</option>
                       </select>
                     </label>
 

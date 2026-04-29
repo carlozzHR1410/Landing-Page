@@ -69,10 +69,51 @@ app.get('/api/reports', async (_request, response) => {
 })
 
 app.post('/api/reports', async (request, response) => {
-  const { reportType, service, location, name, description } = request.body || {}
+  const { reportId, reportType, service, location, name, description } = request.body || {}
 
   if (!['issue', 'restore'].includes(reportType)) {
     return response.status(400).json({ message: 'Tipo de reporte invalido.' })
+  }
+
+  if (reportType === 'restore') {
+    if (!String(reportId || '').trim()) {
+      return response.status(400).json({ message: 'Debes seleccionar un reporte para borrarlo.' })
+    }
+
+    try {
+      const [rows] = await pool.query(
+        `
+          SELECT
+            id,
+            report_type AS reportType,
+            service,
+            location,
+            full_name AS name,
+            description,
+            created_at AS createdAt
+          FROM reports
+          WHERE id = ?
+          LIMIT 1
+        `,
+        [reportId],
+      )
+
+      if (!rows.length) {
+        return response.status(404).json({ message: 'El reporte ya no existe en la base de datos.' })
+      }
+
+      await pool.execute('DELETE FROM reports WHERE id = ? LIMIT 1', [reportId])
+
+      return response.status(200).json({
+        deleted: true,
+        report: mapReport(rows[0]),
+      })
+    } catch (error) {
+      return response.status(500).json({
+        message: 'No se pudo borrar el reporte en MySQL.',
+        detail: error.message,
+      })
+    }
   }
 
   if (![service, location, name, description].every((value) => String(value || '').trim())) {
