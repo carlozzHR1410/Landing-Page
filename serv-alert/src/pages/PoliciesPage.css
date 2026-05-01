@@ -1,0 +1,118 @@
+.policy-page {
+  width: 100%;
+  padding: 0;
+}
+
+.policy-shell {
+  width: min(1120px, calc(100% - 3rem));
+  margin: 0 auto;
+  padding: 2.4rem 0 3.2rem;
+  display: grid;
+  gap: 1.4rem;
+}
+
+.policy-hero,
+.policy-nav,
+.policy-card,
+.policy-note {
+  border: 1px solid var(--chrome-link-hover-border);
+  background: var(--landing-surface, var(--panel-surface));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 22px 44px rgba(1, 7, 15, 0.18);
+  backdrop-filter: blur(16px);
+}
+
+.policy-hero,
+.policy-note {
+  border-radius: 2rem;
+  padding: 1.8rem;
+}
+
+.policy-kicker,
+.policy-card span {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  border-radius: 999px;
+  padding: 0.45rem 0.8rem;
+  background: rgba(97, 195, 255, 0.08);
+  color: #8cd3ff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.policy-hero h1,
+.policy-card h2,
+.policy-note h2 {
+  margin-top: 1rem;
+  color: var(--page-text);
+  font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
+  letter-spacing: -0.03em;
+}
+
+.policy-hero h1 {
+  font-size: clamp(2.3rem, 4vw, 4rem);
+  line-height: 1.02;
+  max-width: 12ch;
+}
+
+.policy-hero p,
+.policy-card p,
+.policy-note p {
+  margin-top: 0.9rem;
+  color: var(--page-subtle);
+  line-height: 1.75;
+}
+
+.policy-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  border-radius: 1.4rem;
+  padding: 0.8rem;
+}
+
+.policy-nav a {
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 0.7rem 1rem;
+  color: var(--chrome-link-text);
+  font-weight: 700;
+}
+
+.policy-nav a:hover {
+  border-color: var(--chrome-link-hover-border);
+  background: var(--chrome-link-hover-bg);
+  color: var(--brand-text);
+}
+
+.policy-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.policy-card {
+  border-radius: 1.6rem;
+  padding: 1.45rem;
+}
+
+@media (max-width: 760px) {
+  .policy-shell {
+    width: min(100%, calc(100% - 2rem));
+    padding: 1.5rem 0 2.4rem;
+  }
+
+  .policy-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .policy-hero,
+  .policy-note,
+  .policy-card {
+    border-radius: 1.4rem;
+  }
+}

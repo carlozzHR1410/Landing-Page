@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
 
 function SunIcon() {
   return (
@@ -26,18 +26,49 @@ function MenuIcon({ open }) {
   )
 }
 
-function Navbar({ theme, onToggleTheme }) {
+function Navbar({ variant = 'landing', theme, onToggleTheme }) {
   const nextThemeLabel = theme === 'dark' ? 'claro' : 'oscuro'
   const [menuOpen, setMenuOpen] = useState(false)
-  const navItems = [
-    { to: '/', label: 'Inicio', end: true },
-    { to: '/reportes', label: 'Reportes' },
-    { to: '/calendario', label: 'Calendario' },
-  ]
+  const [activeSection, setActiveSection] = useState('top')
+  const location = useLocation()
+  const isLandingVariant = variant === 'landing'
+  const isHomePage = location.pathname === '/'
+  const useScrollSections = isLandingVariant && isHomePage
+  const isDemoApp = location.pathname.startsWith('/app-demo')
+  const landingBaseHref = isHomePage ? '' : '/'
+  const appBasePath = isDemoApp ? '/app-demo' : '/app'
+
+  const sectionLinks = isLandingVariant
+    ? [
+        { id: 'nosotros', href: `${landingBaseHref}#nosotros`, label: 'Nosotros' },
+        { id: 'solucion', href: `${landingBaseHref}#solucion`, label: 'Solucion' },
+        { id: 'cobertura', href: `${landingBaseHref}#cobertura`, label: 'Cobertura' },
+      ]
+    : []
+
+  const pageLinks = isLandingVariant
+    ? [
+        { to: '/app-demo/reportes', label: 'App-demo' },
+        { to: '/politicas', label: 'Politicas' },
+      ]
+    : [
+        { to: `${appBasePath}/reportes`, label: 'Reportes' },
+        { to: `${appBasePath}/calendario`, label: 'Calendario' },
+        { to: '/politicas', label: 'Politicas' },
+      ]
+
+  const brandTarget = isLandingVariant ? '/' : `${appBasePath}/reportes`
+  const shortcutLabel = isLandingVariant ? 'Inicio' : 'Volver al sitio'
+  const shortcutHref = isHomePage ? '#top' : '/#top'
+  const brandSubtitle = isLandingVariant
+    ? 'Monitoreo para servicios esenciales'
+    : isDemoApp
+      ? 'App demo operativa'
+      : 'Panel operativo'
 
   useEffect(() => {
     const closeMenuOnDesktop = () => {
-      if (window.innerWidth > 760) {
+      if (window.innerWidth > 820) {
         setMenuOpen(false)
       }
     }
@@ -48,11 +79,62 @@ function Navbar({ theme, onToggleTheme }) {
     return () => window.removeEventListener('resize', closeMenuOnDesktop)
   }, [])
 
+  useEffect(() => {
+    if (!useScrollSections) {
+      return
+    }
+
+    const sectionIds = ['top', 'nosotros', 'solucion', 'cobertura']
+
+    const updateActiveSection = () => {
+      const offset = window.scrollY + 160
+      let currentId = 'top'
+
+      sectionIds.forEach((sectionId) => {
+        const element = document.getElementById(sectionId)
+
+        if (element && offset >= element.offsetTop) {
+          currentId = sectionId
+        }
+      })
+
+      setActiveSection(currentId)
+    }
+
+    const frameId = window.requestAnimationFrame(updateActiveSection)
+    window.addEventListener('scroll', updateActiveSection, { passive: true })
+
+    return () => {
+      window.cancelAnimationFrame(frameId)
+      window.removeEventListener('scroll', updateActiveSection)
+    }
+  }, [useScrollSections])
+
   return (
-    <header className="top-nav">
-      <NavLink to="/" className="brand">
-        <span className="brand-title">SERV-ALERT</span>
-      </NavLink>
+    <header className={`top-nav top-nav-${variant}`}>
+      <div className="top-nav-main">
+        <NavLink to={brandTarget} className="brand" aria-label="Ir al inicio de ServAlert">
+          <span className="brand-mark">SA</span>
+          <span className="brand-copy">
+            <span className="brand-title">SERV-ALERT</span>
+            <span className="brand-subtitle">{brandSubtitle}</span>
+          </span>
+        </NavLink>
+
+        {isLandingVariant ? (
+          <a
+            href={shortcutHref}
+            className={`home-shortcut ${isHomePage && activeSection === 'top' ? 'active' : ''}`}
+            onClick={() => setMenuOpen(false)}
+          >
+            {shortcutLabel}
+          </a>
+        ) : (
+          <NavLink to="/" className="home-shortcut" onClick={() => setMenuOpen(false)}>
+            {shortcutLabel}
+          </NavLink>
+        )}
+      </div>
 
       <div className="nav-cluster">
         <button
@@ -71,11 +153,22 @@ function Navbar({ theme, onToggleTheme }) {
           className={`desktop-links ${menuOpen ? 'mobile-open' : ''}`}
           aria-label="Secciones principales"
         >
-          {navItems.map((item) => (
+          {sectionLinks.map((item) => (
+            <a
+              key={item.href}
+              href={item.href}
+              className={useScrollSections && activeSection === item.id ? 'active' : ''}
+              onClick={() => setMenuOpen(false)}
+            >
+              {item.label}
+            </a>
+          ))}
+
+          {pageLinks.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
-              end={item.end}
+              className={({ isActive }) => (isActive ? 'active' : '')}
               onClick={() => setMenuOpen(false)}
             >
               {item.label}
