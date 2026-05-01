@@ -13,7 +13,7 @@ import {
 
 const heroImage = {
   src: 'https://images.pexels.com/photos/34610704/pexels-photo-34610704.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=1400&w=1200',
-  alt: 'Cuadrilla tecnica atendiendo infraestructura electrica en campo.',
+  alt: 'Personal tecnico trabajando sobre infraestructura electrica durante una atencion en campo, como referencia visual de respuesta y monitoreo de servicios esenciales.',
   creditLabel: 'Foto de Denniz Futalan en Pexels',
   creditHref: 'https://www.pexels.com/photo/utility-workers-repairing-downed-power-lines-34610704/',
 }
@@ -368,11 +368,12 @@ function HomePage() {
               <div className="landing-hero-image-shell">
                 <img className="landing-hero-image" src={heroImage.src} alt={heroImage.alt} />
                 <div className="landing-hero-image-copy">
-                  <span className="landing-panel-label">Vista promocional</span>
-                  <h2>La operacion se vuelve visible, presentable y facil de explicar.</h2>
+                  <span className="landing-panel-label">Respuesta en territorio</span>
+                  <h2>Equipos en campo, informacion clara y decisiones mejor respaldadas.</h2>
                   <p>
-                    La portada deja una primera impresion fuerte y la app-demo conserva el recorrido
-                    completo para probar reportes, actividad y calendario cuando realmente se necesita.
+                    Esta imagen representa el tipo de coordinacion que SERV-ALERT ayuda a comunicar:
+                    incidencias visibles, seguimiento territorial y restablecimientos con contexto
+                    suficiente para equipos tecnicos, instituciones y liderazgos operativos.
                   </p>
 
                   <div className="landing-hero-image-stats">
