@@ -454,10 +454,10 @@ function HomePage() {
         <section className="landing-section" id="nosotros">
           <div className="landing-section-head">
             <span className="landing-eyebrow">SERV-ALERT</span>
-            <h2>Una propuesta pensada para que el producto se vea serio y la demo se sienta util.</h2>
+            <h2>Una propuesta pensada para que el producto se vea serio y la experiencia operativa se sienta natural.</h2>
             <p>
               SERV-ALERT ahora tiene un recorrido mas profesional: una portada que explica y convence,
-              y una app-demo aparte para probar el flujo completo cuando hace falta profundizar.
+              y una app-demo aparte para profundizar en el flujo completo cuando hace falta.
             </p>
           </div>
 
